@@ -1,0 +1,60 @@
+services:
+  bitcoin_service:
+    build:
+      context: .
+      dockerfile: Bitcoin.Dockerfile
+      args:
+        BITCOIN_VERSION: ${BTC_VERSION}
+    image: bitcoin_full_node
+    ports:
+      - 8333:8333
+      - 8332:8332
+    volumes:
+      - bitcoin_volume:/home/btc-user/.bitcoin
+    networks:
+      network:
+        ipv4_address: 192.168.1.219
+  ethereum_geth:
+    build:
+      context: .
+      dockerfile: Ethereum.Dockerfile
+    image: ethereum_snap_node
+    command: /usr/local/bin/start-geth.sh
+    ports:
+      - 8551:8551
+      - 8554:8554
+    volumes:
+      - ethereum_volume:/home/geth/geth
+    networks:
+      network:
+        ipv4_address: 192.168.1.220
+
+  ethereum_blsync:
+      image: ethereum_snap_node
+      depends_on:
+        - ethereum_geth
+      command: /usr/local/bin/start-blsync.sh
+      volumes:
+        - ethereum_volume:/home/geth/geth
+      networks:
+        network:
+          ipv4_address: 192.168.1.221
+
+volumes:
+  bitcoin_volume:
+    driver: local
+  ethereum_volume:
+    driver: local
+
+
+networks:
+  network:
+    driver: macvlan
+    driver_opts:
+      macvlan_mode: bridge
+      parent: ${INTERFACE}
+    ipam:
+      config:
+        - subnet: "192.168.1.0/24"
+          ip_range: "192.168.1.71/32"
+          gateway: "192.168.1.1"
