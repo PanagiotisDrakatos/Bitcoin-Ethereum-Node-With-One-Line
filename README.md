@@ -1,5 +1,5 @@
-# Bitcoin and Ethereum Node Docker Setup
-
+# Run Bitcoin and Ethereum Node With One Single Line easily
+    ./run.sh
 This project provides a Docker-based setup for running both Bitcoin and Ethereum full nodes. It automates the deployment process, making it easy to run and maintain cryptocurrency nodes on your local network.
 
 ## Features
