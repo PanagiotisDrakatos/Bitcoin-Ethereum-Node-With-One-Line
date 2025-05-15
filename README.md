@@ -20,8 +20,23 @@ This project provides a Docker-based setup for running both Bitcoin and Ethereum
 
 - Docker and Docker Compose installed
 - Linux-based system (for the network interface detection)
-- Sufficient disk space for blockchain data (500+ GB recommended)
 - Good internet connection for initial blockchain download
+
+## Hardware Requirements
+
+### Disk Space
+- **Bitcoin Full Node**: Approximately 400-500 GB for the full blockchain
+- **Ethereum Snap Node**: Approximately 150-200 GB (significantly less than a full Ethereum node which requires 1+ TB)
+- **Total Disk Space**: At least 600-700 GB recommended for both nodes
+
+### CPU Requirements
+- **Minimum**: 4-core CPU (Intel Core i5/i7 or AMD equivalent)
+- **Recommended**: 8-core CPU for better performance, especially during initial sync
+
+### RAM Requirements
+- **Minimum**: 8 GB RAM
+- **Recommended**: 16 GB RAM for optimal performance
+- **Note**: During initial sync, memory usage may spike temporarily
 
 ## Installation and Usage
 
