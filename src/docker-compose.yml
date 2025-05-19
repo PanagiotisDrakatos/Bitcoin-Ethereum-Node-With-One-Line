@@ -14,6 +14,87 @@ services:
     networks:
       network:
         ipv4_address: 192.168.1.219
+    healthcheck:
+      test: [
+        "CMD",
+        "bitcoin-cli",
+        "-rpccookiefile=/home/btc-user/.bitcoin/panos.cookie",
+#        "-rpcuser=your_rpc_panos",
+#        "-rpcpassword=your_rpc_panos",
+        "-rpcport=8332",
+        "-rpcconnect=192.168.1.219",
+        "getblockchaininfo"
+      ]
+      interval: 40s
+      timeout: 60s
+      retries: 45
+
+  electrs:
+    image: electrs:latest
+    build:
+      context: ./electrs/.
+    container_name: electrs
+    restart: always
+    ports:
+      - "50001:50001"    # Electrum TCP port exposed on host and container
+    environment:
+      - ELECTRS_NETWORK=bitcoin
+      - ELECTRS_DAEMON_RPC_ADDR=192.168.1.219:8332       # point to your bitcoin_service RPC
+      - ELECTRS_ELECTRUM_RPC_ADDR=192.168.1.223:50001
+      - ELECTRS_LOG_FILTERS=INFO
+      - ELECTRS_DB_DIR=/home/electrs/db
+      - ELECTRS_TIMESTAMP_CACHE_CAPACITY=100000
+      - ELECTRS_VERBOSE_RPC_LOGS=true
+      - ELECTRS_COOKIE_FILE=/home/btc-user/.bitcoin/panos.cookie
+    volumes:
+      - bitcoin_volume:/home/btc-user/.bitcoin:ro    # Mount same bitcoin data volume (read-only)
+    networks:
+      network:
+        ipv4_address: 192.168.1.223 # new IP in the same subnet
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 5 bash -c 'echo > /dev/tcp/192.168.1.223/50001'"]
+      interval: 40s
+      timeout: 60s
+      retries: 45
+    depends_on:
+      bitcoin_service:
+        condition: service_healthy
+
+  explorer:
+    container_name: btc-rpc-explorer
+    environment:
+      BTCEXP_HOST: $BTCEXP_HOST
+      BTCEXP_PORT: $BTCEXP_PORT
+      BTCEXP_ADDRESS_API: $BTCEXP_ADDRESS_API
+      BTCEXP_ELECTRUM_SERVERS: $BTCEXP_ELECTRUM_SERVERS
+      BTCEXP_ELECTRUM_TXINDEX: $BTCEXP_ELECTRUM_TXINDEX
+      BTCEXP_BITCOIND_URI: $BTCEXP_BITCOIND_URI
+      BTCEXP_BITCOIND_USER: $BTCEXP_BITCOIND_USER
+      BTCEXP_BITCOIND_PASS: $BTCEXP_BITCOIND_PASS
+      #BTCEXP_BITCOIND_COOKIE: /home/btc-user/.bitcoin/panos.cookie
+      BTCEXP_BITCOIND_RPC_TIMEOUT: $BTCEXP_BITCOIND_RPC_TIMEOUT
+      BTCEXP_SECURE_SITE: $BTCEXP_SECURE_SITE
+      BTCEXP_COIN: $BTCEXP_COIN
+      BTCEXP_RPC_CONCURRENCY: $BTCEXP_RPC_CONCURRENCY
+      BTCEXP_SLOW_DEVICE_MODE: $BTCEXP_SLOW_DEVICE_MODE
+      BTCEXP_NO_RATES: $BTCEXP_NO_RATES
+      BTCEXP_RPC_ALLOWALL: $BTCEXP_RPC_ALLOWALL
+      BTCEXP_UI_TIMEZONE: $BTCEXP_UI_TIMEZONE
+      BTCEXP_UI_THEME: $BTCEXP_UI_THEME
+    build:
+      context: ./btc-rpc-explorer/.
+    image: btc-rpc-explorer:latest
+    volumes:
+      - bitcoin_volume:/home/btc-user/.bitcoin:ro    # Mount same bitcoin data volume (read-only)
+    networks:
+      network:
+        ipv4_address: 192.168.1.222
+    ports:
+      - "3002:3002"
+    depends_on:
+      electrs:
+        condition: service_healthy
+
   ethereum_geth:
     build:
       context: .
@@ -30,15 +111,15 @@ services:
         ipv4_address: 192.168.1.220
 
   ethereum_blsync:
-      image: ethereum_snap_node
-      depends_on:
-        - ethereum_geth
-      command: /usr/local/bin/start-blsync.sh
-      volumes:
-        - ethereum_volume:/home/geth/geth
-      networks:
-        network:
-          ipv4_address: 192.168.1.221
+    image: ethereum_snap_node
+    depends_on:
+      - ethereum_geth
+    command: /usr/local/bin/start-blsync.sh
+    volumes:
+      - ethereum_volume:/home/geth/geth
+    networks:
+      network:
+        ipv4_address: 192.168.1.221
 
 volumes:
   bitcoin_volume:
