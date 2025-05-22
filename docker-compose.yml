@@ -39,7 +39,8 @@ services:
       - "50001:50001"    # Electrum TCP port exposed on host and container
     environment:
       - ELECTRS_NETWORK=bitcoin
-      - ELECTRS_DAEMON_RPC_ADDR=192.168.1.219:8332       # point to your bitcoin_service RPC
+      - ELECTRS_DAEMON_RPC_ADDR=192.168.1.219:8332
+      - ELECTRS_DAEMON_P2P_ADDR=192.168.1.219:8333
       - ELECTRS_ELECTRUM_RPC_ADDR=192.168.1.223:50001
       - ELECTRS_LOG_FILTERS=INFO
       - ELECTRS_DB_DIR=/home/electrs/db

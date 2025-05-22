@@ -10,6 +10,24 @@ This project provides a Docker-based setup for running both Bitcoin and Ethereum
 - Automatic detection and installation of the latest Bitcoin Core version
 - Persistent blockchain data storage using Docker volumes
 
+### BTC RPC Explorer
+#### Self-Hosted Bitcoin explorer for everyone running Bitcoin Core
+
+![img.png](img.png)
+
+BitcoinExplorer.org is a blockchain explorer that allows users to search and analyze 
+Bitcoin transactions, blocks, and addresses. It provides a user-friendly interface for
+accessing detailed information about the Bitcoin blockchain, making it useful for tracking
+transactions, verifying balances, and exploring network activity. 
+
+This is a self-hosted explorer for the Bitcoin blockchain, driven by RPC calls to your own 
+Bitcoin node. It will run and can already connect to other tools (such as Electrum servers) 
+to accomplish this to achieve a full-featured explorer.  Whatever reasons you may have for 
+running a full node (trustlessness, technical curiosity, supporting the network, etc) 
+it's valuable to appreciate the fullness of your node. With this explorer, you can explore 
+not just the  blockchain database, but also explore all of the functional capabilities of your 
+own node.
+
 ### Ethereum Node
 - Geth node running in snap sync mode
 - HTTP and Auth RPC interfaces for interacting with the node
@@ -75,6 +93,8 @@ The nodes are configured with the following network settings:
   - Auth RPC port: 8551
 
 - Ethereum blsync: 192.168.1.221
+- Btc-rpc-explorer: 192.168.1.222
+- Electrs: 192.168.1.223(Using the same port as btc-rpc-explorer and gives details infos such as txid, blockhash, balances etc)
 
 ## Testing Node Status
 
@@ -83,7 +103,7 @@ The nodes are configured with the following network settings:
 To check if your Bitcoin node is running properly, use the following command:
 
 ```bash
-curl --user your_rpc_Username:your_rpc_Password --data-binary '{"jsonrpc":"1.0","id":"curl","method":"getblockchaininfo","params":[]}' -H 'content-type:text/plain;' http://192.168.1.219:8332/ | jq
+curl --user your_rpc_panos:DrUCN_zExQMDGkRn2e87z4rBxGsboz6p3tXzzE7_vNo --data-binary '{"jsonrpc":"1.0","id":"curl","method":"getblockchaininfo","params":[]}' -H 'content-type:text/plain;' http://192.168.1.219:8332/ | jq
 ```
 
 This will return information about the blockchain, including the current block height and sync status.

@@ -1,5 +1,25 @@
 #!/bin/bash
 
+# Function to check if a command exists
+check_command() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+# Check Docker
+if check_command docker; then
+    echo "✅ Docker is installed: $(docker --version)"
+else
+    echo "❌ Error: Docker is NOT installed please install first to run this script."
+    exit 1
+fi
+
+# Check Docker Compose
+if check_command docker-compose; then
+    echo "✅ Docker Compose is installed: $(docker-compose --version)"
+else
+    echo "❌ Error: Docker Compose is NOT installed please install first to run this script."
+    exit 1
+fi
 # Exit script on any error
 set -e
 
