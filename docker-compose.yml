@@ -102,7 +102,7 @@ services:
     build:
       context: .
       dockerfile: Ethereum.Dockerfile
-    image: ethereum_snap_node
+    image: ethereum_geth
     command: /usr/local/bin/start-geth.sh
     ports:
       - 8551:8551
@@ -112,6 +112,7 @@ services:
     networks:
       network:
         ipv4_address: 192.168.1.220
+
 
   ethereum_blsync:
     image: ethereum_snap_node
