@@ -115,7 +115,7 @@ services:
 
 
   ethereum_blsync:
-    image: ethereum_snap_node
+    image: ethereum_geth
     depends_on:
       - ethereum_geth
     command: /usr/local/bin/start-blsync.sh
