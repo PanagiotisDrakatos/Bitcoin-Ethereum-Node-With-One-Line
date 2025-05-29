@@ -1,5 +1,5 @@
 # Run Bitcoin and Ethereum Node With One Single Line easily
-    ./run.sh
+    chmod +x run.sh start-blsync.sh start-geth.sh | ./run.sh
 This project provides a Docker-based setup for running both Bitcoin and Ethereum full nodes. It automates the deployment process, making it easy to run and maintain cryptocurrency nodes on your local network.
 
 ## Features
