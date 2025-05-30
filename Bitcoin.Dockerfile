@@ -1,4 +1,4 @@
-FROM ubuntu:latest AS bitcoin_builder
+FROM ubuntu:22.04 AS bitcoin_builder
 
 ARG BITCOIN_VERSION
 

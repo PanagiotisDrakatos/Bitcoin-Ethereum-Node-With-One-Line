@@ -1,6 +1,11 @@
-FROM ubuntu:latest AS ethereum_builder
+FROM ubuntu:22.04 AS ethereum_builder
 
-# Install dependencies
+ARG GO_LANG_VERSION=1.24.3
+ENV GOROOT="/usr/local/go"
+ENV GOPATH="/go"
+ENV PATH="${GOROOT}/bin:${GOPATH}/bin:${PATH}"
+
+# Install system dependencies (excluding golang to avoid old version)
 RUN apt-get update -y && \
     apt-get install -y --no-install-recommends \
     ca-certificates \
@@ -13,9 +18,13 @@ RUN apt-get update -y && \
     curl \
     software-properties-common \
     openssl \
-    golang \
     sudo \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install specified Go version
+RUN curl -LO https://go.dev/dl/go${GO_LANG_VERSION}.linux-amd64.tar.gz && \
+    tar -C /usr/local -xzf go${GO_LANG_VERSION}.linux-amd64.tar.gz && \
+    rm go${GO_LANG_VERSION}.linux-amd64.tar.gz
 
 # Create users and groups
 RUN adduser --disabled-password --gecos "" geth && \
@@ -46,6 +55,7 @@ RUN add-apt-repository -y ppa:ethereum/ethereum && \
 
 # Build blsync
 RUN git clone https://github.com/ethereum/go-ethereum.git /opt/go-ethereum && \
+    sed -i 's/^go 1\.23\.0/go 1.24/' /opt/go-ethereum/go.mod || true && \
     cd /opt/go-ethereum/cmd/blsync && \
     go build -o /usr/local/bin/blsync
 
@@ -53,4 +63,3 @@ RUN git clone https://github.com/ethereum/go-ethereum.git /opt/go-ethereum && \
 COPY start-geth.sh /usr/local/bin/
 COPY start-blsync.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/start-geth.sh /usr/local/bin/start-blsync.sh
-
