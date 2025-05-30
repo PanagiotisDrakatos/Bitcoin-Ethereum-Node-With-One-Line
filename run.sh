@@ -66,7 +66,8 @@ if [ -f .env ]; then
    echo "❌ .env file is missing!"
        # Set username
        RPC_USER="bitcoinrpc"
-       RPC_PASS=$(openssl rand -base64 32)
+       RPC_PASS=$(openssl rand -hex 32)
+
 
        # Path to rpcauth.py (change this to actual path)
        RPCAUTH_SCRIPT="rpcauth.py"
@@ -79,7 +80,6 @@ if [ -f .env ]; then
        RPCAUTH_OUTPUT=$(python3 "$RPCAUTH_SCRIPT" "$RPC_USER" "$RPC_PASS")
        AUTH=$(echo "$RPCAUTH_OUTPUT" | grep '^rpcauth=')
        RPC_CREATED_PASS=$(echo "$RPCAUTH_OUTPUT" | awk '/Your password:/{getline; print}')
-
        # Remove the last line if it starts with 'rpcauth', then append the new value
        if [ -f bitcoin.conf ]; then
            # Check if the last line starts with 'rpcauth'

@@ -1,4 +1,4 @@
-# Run Bitcoin and Ethereum Node With One Single Line easily
+# Run Bitcoin and Ethereum Node With One Single Line Easily
     chmod +x run.sh start-blsync.sh start-geth.sh | ./run.sh
 This project provides a Docker-based setup for running both Bitcoin and Ethereum full nodes. It automates the deployment process, making it easy to run and maintain cryptocurrency nodes on your local network.
 
@@ -11,7 +11,7 @@ This project provides a Docker-based setup for running both Bitcoin and Ethereum
 - Persistent blockchain data storage using Docker volumes
 
 ### BTC RPC Explorer
-#### Self-Hosted Bitcoin explorer for everyone running Bitcoin Core
+#### Self-Hosted Bitcoin Explorer for Everyone Running Bitcoin Core
 
 ![img.png](img.png)
 
@@ -22,10 +22,10 @@ transactions, verifying balances, and exploring network activity.
 
 This is a self-hosted explorer for the Bitcoin blockchain, driven by RPC calls to your own 
 Bitcoin node. It will run and can already connect to other tools (such as Electrum servers) 
-to accomplish this to achieve a full-featured explorer.  Whatever reasons you may have for 
-running a full node (trustlessness, technical curiosity, supporting the network, etc) 
+to accomplish this and achieve a full-featured explorer. Whatever reasons you may have for 
+running a full node (trustlessness, technical curiosity, supporting the network, etc.), 
 it's valuable to appreciate the fullness of your node. With this explorer, you can explore 
-not just the  blockchain database, but also explore all of the functional capabilities of your 
+not just the blockchain database, but also explore all of the functional capabilities of your 
 own node.
 
 ### Ethereum Node
@@ -44,7 +44,7 @@ own node.
 
 ### Disk Space
 - **Bitcoin Full Node**: Approximately 400-500 GB for the full blockchain
-- **Ethereum Snap Node**: Approximately 150-200 GB (significantly less than a full Ethereum node which requires 1+ TB)
+- **Ethereum Snap Node**: Approximately 150-200 GB (significantly less than a full Ethereum node, which requires 1+ TB)
 - **Total Disk Space**: At least 600-700 GB recommended for both nodes
 
 ### CPU Requirements
@@ -93,8 +93,25 @@ The nodes are configured with the following network settings:
   - Auth RPC port: 8551
 
 - Ethereum blsync: 192.168.1.221
-- Btc-rpc-explorer: 192.168.1.222
-- Electrs: 192.168.1.223(Using the same port as btc-rpc-explorer and gives details infos such as txid, blockhash, balances etc)
+- BTC RPC Explorer: 192.168.1.222
+- Electrs: 192.168.1.223 (using the same port as BTC RPC Explorer and provides detailed info such as txid, blockhash, balances, etc.)
+
+## Huge ATTENTION!!!
+- If you want to erase everything and start from scratch, you must run the following commands and make sure you don't have any other containers running because it will erase every volume of Docker in order to reclaim free space:
+```bash
+sudo docker compose down --rmi all -v
+sudo docker system prune -a --volumes
+```
+
+- You must delete the `.env` file if you want to run the script again, otherwise it will not work properly.
+- You must also delete the last line of the `bitcoin.conf` file if it exists, which is something like this, to apply the new changes you made in the .env file:
+```
+rpcauth=bitcoinrpc:61e94e049fd05a9a31185d99f343aa98$61479561dfbf5ddbd795a94e3d7ad350e24387e9c551c08bc0d204f2791f6f7f
+```
+
+- In addition, make sure the following line exists in the Dockerfile under the electrs directory, else electrs will not work properly. Also, give it enough time to start:
+
+```CMD ["electrs"]```
 
 ## Testing Node Status
 
