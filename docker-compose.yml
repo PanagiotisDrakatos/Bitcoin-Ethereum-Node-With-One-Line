@@ -42,13 +42,14 @@ services:
       - ELECTRS_ELECTRUM_RPC_ADDR=192.168.1.223:50001
       - ELECTRS_LOG_FILTERS=INFO
       - ELECTRS_DB_DIR=/home/electrs/db
-      - ELECTRS_VERBOSE_RPC_LOGS=true
-      - ELECTRS_IGNORE_MEMPOOL=true
-      - ELECTRS_TIMESTAMP_CACHE_CAPACITY=1000000  # Higher cache for faster lookups
-      - ELECTRS_INDEX_LOOKUP_LIMIT=10000
+      - ELECTRS_VERBOSE_RPC_LOGS=false # Disable verbose logs to reduce overhead
+      - ELECTRS_IGNORE_MEMPOOL=true # Skip mempool to boost sync speed
+      - ELECTRS_TIMESTAMP_CACHE_CAPACITY=2000000 # Increased cache for better lookup performance
+      - ELECTRS_INDEX_LOOKUP_LIMIT=20000 # Raised lookup limit for addresses with many transactions
       - ELECTRS_COOKIE_FILE=/home/btc-user/.bitcoin/btc.cookie
-      - ELECTRS_THREADS=4
-      - ELECTRS_DB_CACHE_SIZE=4096
+      - ELECTRS_THREADS=8 # Set an optimal thread count based on typical CPU usage
+      - ELECTRS_DB_CACHE_SIZE=2048 # Adjusted DB cache size for efficient storage handling
+      - ELECTRS_JSONRPC_CONCURRENCY=16 # Allow more concurrent requests for faster API calls
     volumes:
       - electrs_db:/home/electrs/db
       - bitcoin_volume:/home/btc-user/.bitcoin:ro    # Mount same bitcoin data volume (read-only)
