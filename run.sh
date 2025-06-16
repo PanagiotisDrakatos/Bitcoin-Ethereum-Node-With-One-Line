@@ -110,7 +110,7 @@ if [ -f .env ]; then
        echo "BTCEXP_BITCOIND_RPC_TIMEOUT=70000" >> .env
        echo "BTCEXP_SECURE_SITE=false" >> .env
        echo "BTCEXP_COIN=BTC" >> .env
-       echo "BTCEXP_RPC_CONCURRENCY=550" >> .env
+       echo "BTCEXP_RPC_CONCURRENCY=4" >> .env
        echo "BTCEXP_SLOW_DEVICE_MODE=false" >> .env
        echo "BTCEXP_NO_RATES=true" >> .env
        echo "BTCEXP_RPC_ALLOWALL=true" >> .env

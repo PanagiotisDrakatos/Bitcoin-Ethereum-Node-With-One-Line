@@ -65,6 +65,24 @@ services:
       bitcoin_service:
         condition: service_healthy
 
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      network:
+        ipv4_address: 192.168.1.224
+    volumes:
+      - redis-data:/data
+    command: [ "redis-server", "--appendonly", "yes" ]
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 40s
+      timeout: 60s
+      retries: 45
+
   explorer:
     container_name: btc-rpc-explorer
     environment:
@@ -85,6 +103,8 @@ services:
       BTCEXP_RPC_ALLOWALL: $BTCEXP_RPC_ALLOWALL
       BTCEXP_UI_TIMEZONE: $BTCEXP_UI_TIMEZONE
       BTCEXP_UI_THEME: $BTCEXP_UI_THEME
+      BTCEXP_NO_INMEMORY_RPC_CACHE: true
+      BTCEXP_REDIS_URL: redis://192.168.1.224:6379
     build:
       context: ./btc-rpc-explorer/.
     image: btc-rpc-explorer:latest
@@ -96,6 +116,8 @@ services:
     ports:
       - "3002:3002"
     depends_on:
+      redis:
+        condition: service_healthy
       electrs:
         condition: service_healthy
 
@@ -116,7 +138,7 @@ services:
 
 
   ethereum_blsync:
-    image: ethereum_geth
+    image: ethereum_snap_node
     depends_on:
       - ethereum_geth
     command: /usr/local/bin/start-blsync.sh
@@ -127,6 +149,8 @@ services:
         ipv4_address: 192.168.1.221
 
 volumes:
+  redis-data:
+    driver: local
   bitcoin_volume:
     driver: local
   ethereum_volume:
