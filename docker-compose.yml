@@ -65,59 +65,60 @@ services:
       bitcoin_service:
         condition: service_healthy
 
-  redis:
-    image: redis:latest
-    container_name: redis
-    ports:
-      - "6379:6379"
-    networks:
-      network:
-        ipv4_address: 192.168.1.224
-    volumes:
-      - redis-data:/data
-    command: [ "redis-server", "--appendonly", "yes" ]
-    restart: unless-stopped
-    healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
-      interval: 40s
-      timeout: 60s
-      retries: 45
+  #  redis:
+  #    image: redis:latest
+  #    container_name: redis
+  #    ports:
+  #      - "6379:6379"
+  #    networks:
+  #      network:
+  #        ipv4_address: 192.168.1.224
+  #    volumes:
+  #      - redis-data:/data
+  #    command: [ "redis-server", "--appendonly", "yes" ]
+  #    restart: unless-stopped
+  #    healthcheck:
+  #      test: [ "CMD", "redis-cli", "ping" ]
+  #      interval: 40s
+  #      timeout: 60s
+  #      retries: 45
 
   explorer:
     container_name: btc-rpc-explorer
     environment:
-      BTCEXP_HOST: $BTCEXP_HOST
-      BTCEXP_PORT: $BTCEXP_PORT
-      BTCEXP_ADDRESS_API: $BTCEXP_ADDRESS_API
-      BTCEXP_ELECTRUM_SERVERS: $BTCEXP_ELECTRUM_SERVERS
-      BTCEXP_ELECTRUM_TXINDEX: $BTCEXP_ELECTRUM_TXINDEX
-      BTCEXP_BITCOIND_URI: $BTCEXP_BITCOIND_URI
-      BTCEXP_BITCOIND_USER: $BTCEXP_BITCOIND_USER
-      BTCEXP_BITCOIND_PASS: $BTCEXP_BITCOIND_PASS
-      BTCEXP_BITCOIND_RPC_TIMEOUT: $BTCEXP_BITCOIND_RPC_TIMEOUT
-      BTCEXP_SECURE_SITE: $BTCEXP_SECURE_SITE
-      BTCEXP_COIN: $BTCEXP_COIN
-      BTCEXP_RPC_CONCURRENCY: $BTCEXP_RPC_CONCURRENCY
-      BTCEXP_SLOW_DEVICE_MODE: $BTCEXP_SLOW_DEVICE_MODE
-      BTCEXP_NO_RATES: $BTCEXP_NO_RATES
-      BTCEXP_RPC_ALLOWALL: $BTCEXP_RPC_ALLOWALL
-      BTCEXP_UI_TIMEZONE: $BTCEXP_UI_TIMEZONE
-      BTCEXP_UI_THEME: $BTCEXP_UI_THEME
-      BTCEXP_NO_INMEMORY_RPC_CACHE: true
-      BTCEXP_REDIS_URL: redis://192.168.1.224:6379
+      BTCEXP_HOST: ${BTCEXP_HOST}
+      BTCEXP_PORT: ${BTCEXP_PORT}
+      BTCEXP_ADDRESS_API: ${BTCEXP_ADDRESS_API}
+      BTCEXP_ELECTRUM_SERVERS: ${BTCEXP_ELECTRUM_SERVERS}
+      BTCEXP_ELECTRUM_TXINDEX: ${BTCEXP_ELECTRUM_TXINDEX}
+      BTCEXP_BITCOIND_URI: ${BTCEXP_BITCOIND_URI}
+      BTCEXP_BITCOIND_USER: ${BTCEXP_BITCOIND_USER}
+      BTCEXP_BITCOIND_PASS: ${BTCEXP_BITCOIND_PASS}
+      BTCEXP_BITCOIND_RPC_TIMEOUT: ${BTCEXP_BITCOIND_RPC_TIMEOUT}
+      BTCEXP_SECURE_SITE: ${BTCEXP_SECURE_SITE}
+      BTCEXP_COIN: ${BTCEXP_COIN}
+      BTCEXP_RPC_CONCURRENCY: ${BTCEXP_RPC_CONCURRENCY}
+      BTCEXP_SLOW_DEVICE_MODE: ${BTCEXP_SLOW_DEVICE_MODE}
+      BTCEXP_NO_RATES: ${BTCEXP_NO_RATES}
+      BTCEXP_RPC_ALLOWALL: ${BTCEXP_RPC_ALLOWALL}
+      BTCEXP_UI_TIMEZONE: ${BTCEXP_UI_TIMEZONE}
+      BTCEXP_UI_THEME: ${BTCEXP_UI_THEME}
+      BTCEXP_NO_INMEMORY_RPC_CACHE: ${BTCEXP_NO_INMEMORY_RPC_CACHE}
+      BTCEXP_OLD_SPACE_MAX_SIZE: ${BTCEXP_OLD_SPACE_MAX_SIZE
+      #BTCEXP_REDIS_URL: redis://192.168.1.224:6379
     build:
-      context: ./btc-rpc-explorer/.
+      context: ./btc-rpc-explorer
     image: btc-rpc-explorer:latest
     volumes:
-      - bitcoin_volume:/home/btc-user/.bitcoin:ro    # Mount same bitcoin data volume (read-only)
+      - bitcoin_volume:/home/btc-user/.bitcoin:ro    # Adjust path if your Bitcoin node uses a different one
     networks:
       network:
         ipv4_address: 192.168.1.222
     ports:
       - "3002:3002"
     depends_on:
-      redis:
-        condition: service_healthy
+      # redis:
+      #   condition: service_healthy
       electrs:
         condition: service_healthy
 
@@ -130,8 +131,14 @@ services:
     ports:
       - 8551:8551
       - 8554:8554
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 5 bash -c 'echo > /dev/tcp/192.168.1.220/8551'" ]
+      interval: 40s
+      timeout: 60s
+      retries: 45
     volumes:
       - ethereum_volume:/home/geth/geth
+      - ./jwt.hex:/var/lib/secrets/jwt.hex:ro
     networks:
       network:
         ipv4_address: 192.168.1.220
@@ -144,6 +151,7 @@ services:
     command: /usr/local/bin/start-blsync.sh
     volumes:
       - ethereum_volume:/home/geth/geth
+      - ./jwt.hex:/var/lib/secrets/jwt.hex:ro
     networks:
       network:
         ipv4_address: 192.168.1.221

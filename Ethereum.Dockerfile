@@ -33,10 +33,10 @@ RUN adduser --disabled-password --gecos "" geth && \
     usermod -a -G eth geth && \
     usermod -a -G eth prysm-beacon
 
+COPY jwt.hex /var/lib/secrets/jwt.hex
+RUN chown root:eth /var/lib/secrets/jwt.hex && chmod 640 /var/lib/secrets/jwt.hex
 # Generate JWT secret
-RUN mkdir -p /var/lib/secrets && \
-    openssl rand -hex 32 | tr -d '\n' > /var/lib/secrets/jwt.hex && \
-    chgrp -R eth /var/lib/secrets && \
+RUN chgrp -R eth /var/lib/secrets && \
     chmod 750 /var/lib/secrets && \
     chown root:eth /var/lib/secrets/jwt.hex && \
     chmod 640 /var/lib/secrets/jwt.hex

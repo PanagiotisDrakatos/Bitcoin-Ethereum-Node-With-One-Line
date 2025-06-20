@@ -60,6 +60,17 @@ fi
 echo "Latest Bitcoin Core version: $BTC_VERSION"
 echo "Interface : $INTERFACE"
 
+# Path to your jwt.hex file
+JWT_FILE="./jwt.hex"
+
+if [ -f "$JWT_FILE" ]; then
+  echo "✅ $JWT_FILE already exists."
+else
+  echo "🔑 $JWT_FILE does not exist. Creating..."
+  openssl rand -hex 32 > "$JWT_FILE"
+  echo "✅ $JWT_FILE created."
+fi
+
 if [ -f .env ]; then
     echo "✅ .env file exists!"
  else
@@ -103,15 +114,17 @@ if [ -f .env ]; then
        echo "BTCEXP_PORT=3002" >> .env
        echo "BTCEXP_ADDRESS_API=electrum" >> .env
        echo "BTCEXP_ELECTRUM_SERVERS=tcp://192.168.1.223:50001" >> .env
-       echo "BTCEXP_ELECTRUM_TXINDEX=true" >> .env
+       echo "BTCEXP_ELECTRUM_TXINDEX=false" >> .env
        echo "BTCEXP_BITCOIND_URI=bitcoin://${RPC_USER}:${RPC_CREATED_PASS}@192.168.1.219:8332?timeout=40000">> .env
        echo "BTCEXP_BITCOIND_USER=${RPC_USER}" >> .env
        echo "BTCEXP_BITCOIND_PASS=${RPC_CREATED_PASS}" >> .env
        echo "BTCEXP_BITCOIND_RPC_TIMEOUT=70000" >> .env
        echo "BTCEXP_SECURE_SITE=false" >> .env
        echo "BTCEXP_COIN=BTC" >> .env
-       echo "BTCEXP_RPC_CONCURRENCY=4" >> .env
+       echo "BTCEXP_RPC_CONCURRENCY=16" >> .env
+       echo "BTCEXP_OLD_SPACE_MAX_SIZE=8192" >> .env
        echo "BTCEXP_SLOW_DEVICE_MODE=false" >> .env
+       echo "BTCEXP_NO_INMEMORY_RPC_CACHE=true" >> .env
        echo "BTCEXP_NO_RATES=true" >> .env
        echo "BTCEXP_RPC_ALLOWALL=true" >> .env
        echo "BTCEXP_UI_TIMEZONE=local" >> .env
